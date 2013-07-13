@@ -21,6 +21,9 @@ var Ship = (function(createjs) {
 
 		setupGraphics.call(this);
 
+		this.alive = true;
+		this.invincible = false;
+
 		stage.addChild(this);
 		//Game.cacheShape(this, 40);
 	}
@@ -75,10 +78,14 @@ var Ship = (function(createjs) {
 			}
 		});
 
+		this.alpha = this.invincible ? 0.5 : 1;
+
 	};
 
 	Ship.prototype.shoot = function() {
-		this.bullets.push(new Bullet(this));
+		if (this.alive) {
+			this.bullets.push(new Bullet(this));
+		}
 	};
 
 	var updateRotation = function() {
@@ -90,26 +97,9 @@ var Ship = (function(createjs) {
 
 	Ship.prototype.checkCollisons = function(asteroids) {
 		var retVal = false;
-		// var _this = this;
-		// _.each(asteroids, function(asteroid) {
-		// 	var dist = Math.sqrt(Math.pow(asteroid.x - this.x, 2) + Math.pow(asteroid.y - this.y, 2));
-		// 	if (dist > 120) return;
-		// 	var avertices = Game.localToLocalVertices(_this, asteroid).slice(0);
-		// 	var svertices = Game.localToLocalVertices(asteroid, _this).slice(0);
-		// 	_.each(avertices, function(vertex) {
-		// 		if (asteroid.hitTest(vertex[0], vertex[1])) {
-		// 			retVal = true;
-		// 			return;
-		// 		}
-		// 	});
-		// 	_.each(svertices, function(vertex) {
-		// 		if (_this.hitTest(vertex[0], vertex[1])) {
-		// 			retVal = true;
-		// 			return;
-		// 		}
-		// 	});
-		// 	if (retVal === true) return;
-		// });
+		if (this.invincible) {
+			return false;
+		}
 		for (var i = 0; i < asteroids.length; i++) {
 			var asteroid = asteroids[i];
 			var dist = Math.sqrt(Math.pow(asteroid.x - this.x, 2) + Math.pow(asteroid.y - this.y, 2));
@@ -147,6 +137,17 @@ var Ship = (function(createjs) {
 	Ship.prototype.setRotationPoint = function(x, y) {
 		this.rotationPoint.x = x;
 		this.rotationPoint.y = y;
+	};
+
+	Ship.prototype.die = function() {
+		this.alive = false;
+		this.visible = false;
+		new ShipDeath(this);
+	};
+
+	Ship.prototype.revive = function() {
+		this.alive = true;
+		this.visible = true;
 	};
 
 	return Ship;

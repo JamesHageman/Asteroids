@@ -1,5 +1,3 @@
-var debugShape = new createjs.Shape();
-
 var Game = (function (createjs) {
 	// Private Members
 	var canvas,
@@ -12,19 +10,25 @@ var Game = (function (createjs) {
 		fpsLabel,
 		levelController,
 		fieldIsClear,
-		currentLevel;
+		currentLevel,
+		timeline;
 
 	var gameLoop = function(event) {
 		var delta = event.delta / 1000;
 
-		ship.updatePositions(delta);
 		_.each(asteroids, function(asteroid) {
 			asteroid.updatePosition(delta);
 		});
-		shootIfScheduled();
-		debugShape.visible = ship.checkCollisons(asteroids);
+		if (ship.alive) {
+			ship.updatePositions(delta);
+			shootIfScheduled();
+			if (ship.checkCollisons(asteroids)) {
+				ship.die();
+				stage.removeChild(ship);
+				setTimeout(reviveShip, 3000);
+			}
+		}
 		ship.checkBulletCollisions(asteroids);
-		// console.log('loop');
 		stage.update();
 		if (asteroids.length < 1 && !fieldIsClear) {
 			fieldIsClear = true;
@@ -35,8 +39,22 @@ var Game = (function (createjs) {
 		}
 	};
 
+	var reviveShip = function() {
+		ship.revive();
+		stage.addChild(ship);
+		ship.invincible = true;
+		ship.velocity.x = 0;
+		ship.velocity.y = 0;
+		ship.x = stage.canvas.width / 2;
+		ship.y = stage.canvas.height / 2;
+		setTimeout(function() {
+			ship.invincible = false;
+		}, 3000);
+	};
+
 	var nextLevel = function() {
-		levelController.initLevel(++currentLevel);
+		currentLevel++;
+		levelController.initLevel(currentLevel);
 		fieldIsClear = false;
 	};
 
@@ -126,6 +144,9 @@ var Game = (function (createjs) {
 			canvas.addEventListener('pointermove', pointerMove);
 			canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
+			// timeline = new createjs.Timeline();
+
+
 			stage = new createjs.Stage(canvas);
 			background = new Background(stage);
 			ship = new Ship(canvas.width / 2, canvas.height / 2, stage);
@@ -138,12 +159,6 @@ var Game = (function (createjs) {
 
 			levelController = new LevelController(ship, stage);
 			levelController.initLevel(currentLevel);
-
-			stage.addChild(debugShape);
-			debugShape.graphics
-				.beginFill('#f00')
-				.drawRect(0, 0, 32, 32)
-				.endFill();
 
 			fpsLabel = new createjs.Text('FPS', '20px Arial', '#fff');
 			stage.addChild(fpsLabel);

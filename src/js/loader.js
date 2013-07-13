@@ -1,17 +1,20 @@
 require(['js/lib/create.js',
 		'js/lib/underscore.js',
-		'js/lib/hand.js',
-		'js/src/Game.js'],
+		'js/lib/hand.js'],
 function() {
-	require(['js/src/Background.js',
+	require(['js/src/Game.js',
+			'js/src/Background.js',
 			'js/src/Bullet.js',
 			'js/src/Asteroid.js',
 			'js/src/Ship.js',
-			'js/src/LevelController.js',
-			'js/data/asteroidPoints.js',
-			'js/data/shipPoints.js',
-			'js/data/asteroidPositions.js'],
+			'js/src/ShipDeath.js',
+			'js/src/LevelController.js'],
 	function() {
-		Game.init();
+		require(['js/data/asteroidPoints.js',
+				'js/data/asteroidPositions.js',
+				'js/data/shipPoints.js'],
+		function() {
+			Game.init();
+		});
 	});
 });
