@@ -22,11 +22,10 @@ var Asteroid = (function(createjs) {
 	};
 
 	var randomizeVertices = function() {
-		_.each(this.vertices, function(vertex) {
-			var range = 0;
-			vertex[0] -= Math.random() * range * ((vertex[0] < 0) ? -1 : 1);
-			vertex[1] -= Math.random() * range * ((vertex[0] < 0) ? -1 : 1);
-		});
+		for (var i = 0; i < this.vertices.length; i++) {
+			this.vertices[i] = this.vertices[i].slice(0);
+			this.vertices[i][0] += Math.random() * 0.8 - 0.4;
+		}
 	};
 
 	function Asteroid(x, y, state, stage) {
@@ -46,7 +45,7 @@ var Asteroid = (function(createjs) {
 		this.vertices = Game.scaleVertices(this, this.scale);
 
 		setupGraphics.call(this);
-		Game.cacheShape(this, this.scale + 5);
+		// Game.cacheShape(this, this.scale * 2);
 		this.stage = stage;
 		stage.addChild(this);
 	}

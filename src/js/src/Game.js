@@ -19,9 +19,9 @@ var Game = (function (createjs) {
 		_.each(asteroids, function(asteroid) {
 			asteroid.updatePosition(delta);
 		});
+		ship.updatePositions(delta);
 		if (ship.alive) {
 			ship.updateGraphics();
-			ship.updatePositions(delta);
 			shootIfScheduled();
 			var collisionAsteroid = ship.checkCollisons(asteroids);
 			if (collisionAsteroid) {

@@ -51,17 +51,17 @@ var Ship = (function(createjs) {
 
 	Ship.prototype.updatePositions = function(delta) {
 		if (this.accelerating) {
-			this.velocity.x += Math.cos(this.rotation * Math.PI / 180) * 20;
-			this.velocity.y += Math.sin(this.rotation * Math.PI / 180) * 20;
+			this.velocity.x += Math.cos(this.rotation * Math.PI / 180) * 10;
+			this.velocity.y += Math.sin(this.rotation * Math.PI / 180) * 10;
 		}
 
 		// Move
 		this.x += this.velocity.x * delta;
 		this.y += this.velocity.y * delta;
 
-		// Apply friction
-		this.velocity.x *= 0.99;
-		this.velocity.y *= 0.99;
+		// DON'T Apply friction
+		// this.velocity.x *= 0.99;
+		// this.velocity.y *= 0.99;
 
 		// Update rotation
 		updateRotation.call(this);
@@ -77,7 +77,7 @@ var Ship = (function(createjs) {
 
 		_.each(this.bullets, function(bullet) {
 			bullet.updatePosition(delta);
-			if (bullet.timeAlive > 1) {
+			if (bullet.timeAlive > Bullet.LIFE_LEN) {
 				bullet.alive = false;
 			}
 		});

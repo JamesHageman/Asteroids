@@ -17,6 +17,9 @@ var Bullet = (function(createjs) {
 		this.timeAlive = 0;
 
 		ship.stage.addChildAt(this, ship.stage.getChildIndex(ship));
+		createjs.Tween.get(this)
+			.wait(Bullet.LIFE_LEN * 800)
+			.to({ alpha: 0 }, Bullet.LIFE_LEN * 200);
 	}
 
 	Bullet.prototype.updatePosition = function(delta) {
@@ -35,6 +38,8 @@ var Bullet = (function(createjs) {
 		}
 		this.timeAlive += delta;
 	};
+
+	Bullet.LIFE_LEN = 1; // 1 second
 
 	return Bullet;
 })(createjs);
