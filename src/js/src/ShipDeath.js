@@ -5,16 +5,18 @@ var ShipDeath = (function(createjs) {
 	}).bind(this);
 
 	function ShipDeath(ship, asteroid) {
+		if (!Game.settings.useParticles) return;
 		this.ship = ship;
 		this.lines = [];
 		for (var i = 0; i < 15; i++) {
 			var line = this.lines[i];
+			var length = 36;
 			line = new createjs.Shape();
 			line.graphics
 				.setStrokeStyle(4)
 				.beginStroke('#fff')
-				.moveTo(-18, 0)
-				.lineTo(18, 0)
+				.moveTo(-length / 2, 0)
+				.lineTo(length / 2, 0)
 				.endStroke();
 			line.x = this.ship.x;
 			line.y = this.ship.y;
@@ -54,7 +56,7 @@ var ShipDeath = (function(createjs) {
 			var targetX = line.x + Math.cos(lineDirection) * lineSpeed * animLength;
 			var targetY = line.y + Math.sin(lineDirection) * lineSpeed * animLength;
 
-
+			Game.cacheShape(line, length / 2);
 
 			createjs.Tween
 				.get(line)

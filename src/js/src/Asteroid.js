@@ -45,7 +45,7 @@ var Asteroid = (function(createjs) {
 		this.vertices = Game.scaleVertices(this, this.scale);
 
 		setupGraphics.call(this);
-		// Game.cacheShape(this, this.scale * 2);
+		Game.cacheShape(this, this.scale * 2);
 		this.stage = stage;
 		stage.addChild(this);
 	}

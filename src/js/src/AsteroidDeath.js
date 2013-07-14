@@ -1,6 +1,7 @@
 var AsteroidDeath = (function(createjs) {
 
 	function AsteroidDeath(asteroid, bullet) {
+		if (!Game.settings.useParticles) return;
 		this.asteroid = asteroid;
 		this.lines = [];
 		for (var i = 0; i < 8; i++) {
@@ -28,6 +29,8 @@ var AsteroidDeath = (function(createjs) {
 			var direction = bullet.direction - 60 + Math.random() *  120;
 			var targetX = line.x + Math.cos(direction * Math.PI / 180) * distance;
 			var targetY = line.y + Math.sin(direction * Math.PI / 180) * distance;
+
+			Game.cacheShape(line, length / 2);
 
 			createjs.Tween.get(line)
 				.to({ x: targetX, y: targetY, alpha: 0, rotation: rotationTarget }, 2000, createjs.Ease.linear);

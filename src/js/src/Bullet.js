@@ -16,6 +16,8 @@ var Bullet = (function(createjs) {
 
 		this.timeAlive = 0;
 
+		Game.cacheShape(this, 4);
+
 		ship.stage.addChildAt(this, ship.stage.getChildIndex(ship));
 		createjs.Tween.get(this)
 			.wait(Bullet.LIFE_LEN * 800)
@@ -37,6 +39,23 @@ var Bullet = (function(createjs) {
 			this.y = 0;
 		}
 		this.timeAlive += delta;
+		if (Game.settings.useParticles) {
+			addParticle.call(this);
+		}
+	};
+
+	var addParticle = function() {
+		var particle = new createjs.Shape(this.graphics);
+		particle.x = this.x;
+		particle.y = this.y;
+		this.stage.addChild(particle);
+		var stage = this.stage;
+		createjs.Tween
+			.get(particle)
+			.to({ alpha: 0 }, 150, createjs.Ease.quadIn)
+			.call(function() {
+				stage.removeChild(particle);
+			});
 	};
 
 	Bullet.LIFE_LEN = 1; // 1 second

@@ -13,6 +13,16 @@ var Game = (function (createjs) {
 		currentLevel,
 		timeline;
 
+	var launchFullScreen = function(element) {
+		if (element.requestFullscreen) {
+			element.requestFullscreen();
+		} else if (element.mozRequestFullscreen) {
+			element.mozRequestFullscreen();
+		} else if (element.webkitRequestFullscreen) {
+			element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+		}
+	};
+
 	var gameLoop = function(event) {
 		var delta = event.delta / 1000;
 
@@ -134,24 +144,35 @@ var Game = (function (createjs) {
 	// Public Exports
 	var Game = {
 		Resources: {},
+		settings: {},
 		init: function() {
-
+			// alert(navigator.userAgent);
+			this.settings.useParticles = true;
+			if (navigator.userAgent.toLowerCase().search('ipad') !== -1) {
+				this.settings.useParticles = false;
+			}
 			touches = [];
 			shootSchedule = [];
 
 			canvas = document.getElementById('canvas');
+			// launchFullScreen(canvas);
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 			canvas.addEventListener('pointerdown', pointerDown);
 			canvas.addEventListener('pointerup', pointerUp);
 			canvas.addEventListener('pointermove', pointerMove);
 			canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+			window.addEventListener('resize', function() {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+
+			});
 
 			// timeline = new createjs.Timeline();
 
 
 			stage = new createjs.Stage(canvas);
-			background = new Background(stage);
+			// background = new Background(stage);
 			ship = new Ship(canvas.width / 2, canvas.height / 2, stage);
 
 			asteroids = [];

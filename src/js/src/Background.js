@@ -9,7 +9,7 @@ var Background = (function(createjs) {
 			.drawRect(0, 0, stage.canvas.width, stage.canvas.height)
 			.endFill();
 		this.cache(0, 0, stage.canvas.width, stage.canvas.height);
-		stage.addChild(this);
+		stage.addChildAt(0, this);
 	}
 
 	return Background;

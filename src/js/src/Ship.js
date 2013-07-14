@@ -29,7 +29,7 @@ var Ship = (function(createjs) {
 		this.invincible = false;
 
 		stage.addChild(this);
-		//Game.cacheShape(this, 40);
+		Game.cacheShape(this, 40);
 	}
 
 	var setupGraphics = function() {
@@ -139,7 +139,7 @@ var Ship = (function(createjs) {
 		for (var i = 0; i < asteroids.length; i++) {
 			var asteroid = asteroids[i];
 			var dist = Math.sqrt(Math.pow(asteroid.x - this.x, 2) + Math.pow(asteroid.y - this.y, 2));
-			if (dist > 120) continue;
+			if (dist > 40 + asteroid.state.scale * 1.2) continue;
 			var avertices = Game.localToLocalVertices(this, asteroid).slice(0);
 			var svertices = Game.localToLocalVertices(asteroid, this).slice(0);
 			var j, vertex;
