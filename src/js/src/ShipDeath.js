@@ -4,7 +4,7 @@ var ShipDeath = (function(createjs) {
 		console.log('done!');
 	}).bind(this);
 
-	function ShipDeath(ship, timeline) {
+	function ShipDeath(ship, asteroid) {
 		this.ship = ship;
 		this.lines = [];
 		for (var i = 0; i < 15; i++) {
@@ -27,14 +27,43 @@ var ShipDeath = (function(createjs) {
 				rotationTarget *= -1;
 			}
 
-			var distance = 300;
-			var direction = Math.random() * Math.PI * 2; // radians used is trig functions
-			var targetX = line.x + Math.cos(direction) * distance;
-			var targetY = line.y + Math.sin(direction) * distance;
+			// var shipSpeed = Math.sqrt(ship.velocity.x * ship.velocity.x + ship.velocity.y * ship.velocity.y);
+			// var shipDirection = Math.atan2(ship.velocity.y, ship.velocity.x);
+
+			// var distance = shipSpeed * 3 / 2;
+			// var direction = shipDirection - Math.PI / 2 + Math.random() * Math.PI;
+
+			var sv = {
+				x: ship.velocity.x,
+				y: ship.velocity.y
+			};
+			var av = {
+				x: asteroid.speed * Math.cos(asteroid.direction * Math.PI / 180),
+				y: asteroid.speed * Math.sin(asteroid.direction * Math.PI / 180)
+			};
+			var vel = {
+				x: sv.x + av.x,
+				y: sv.y + av.y
+			};
+
+			var lineSpeed = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
+			var lineDirection = Math.atan2(vel.y, vel.x) - Math.PI / 3 + Math.random() * Math.PI * 2 / 3;
+
+			var animLength = 3;
+
+			var targetX = line.x + Math.cos(lineDirection) * lineSpeed * animLength;
+			var targetY = line.y + Math.sin(lineDirection) * lineSpeed * animLength;
+
+
 
 			createjs.Tween
 				.get(line)
-				.to({x: targetX, y: targetY, alpha: 0, rotation: rotationTarget}, 3000, createjs.Ease.quadOut)
+				.to({
+					x: targetX,
+					y: targetY,
+					alpha: 0,
+					rotation: rotationTarget
+				}, 1000 * animLength, createjs.Ease.linear)
 				.call(animDone);
 
 		}

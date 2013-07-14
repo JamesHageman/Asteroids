@@ -5,7 +5,7 @@ var Asteroid = (function(createjs) {
 		this.graphics
 			.setStrokeStyle(4)
 			.beginStroke('#fff')
-			.beginFill('#000')
+			.beginFill('rgba(0,0,0,0.1)')
 			.moveTo(points[0][0], points[0][1]);
 		for (var i = 1; i < points.length; i++) {
 			this.graphics.lineTo(points[i][0], points[i][1]);
@@ -17,20 +17,8 @@ var Asteroid = (function(createjs) {
 	};
 
 	var setScale = function() {
-		var scale = 0;
-		var speed = 0;
-		if (this.state == Asteroid.LARGE) {
-			scale = 80;
-			speed = 40;
-		} else if (this.state == Asteroid.MEDIUM) {
-			scale = 50;
-			speed = 70;
-		} else if (this.state == Asteroid.SMALL) {
-			scale = 20;
-			speed = 100;
-		}
-		this.scale = scale;
-		this.speed = speed;
+		this.scale = this.state.scale;
+		this.speed = this.state.speed;
 	};
 
 	var randomizeVertices = function() {
@@ -68,10 +56,12 @@ var Asteroid = (function(createjs) {
 		if (this.hitTest(point.x, point.y)) {
 			if (this.state == Asteroid.LARGE || this.state == Asteroid.MEDIUM) {
 				var state = (this.state == Asteroid.LARGE) ? Asteroid.MEDIUM : Asteroid.SMALL;
-				Game.addAsteroid(this.x, this.y, state);
-				Game.addAsteroid(this.x, this.y, state);
+				for (var i = 0; i < 3; i++) {
+					Game.addAsteroid(this.x, this.y, state, Math.random() * 360);
+				}
 			}
 			Game.removeAsteroid(this);
+			new AsteroidDeath(this, bullet);
 			bullet.alive = false;
 		}
 	};
@@ -95,9 +85,9 @@ var Asteroid = (function(createjs) {
 		}
 	};
 
-	Asteroid.LARGE = 0;
-	Asteroid.MEDIUM = 1;
-	Asteroid.SMALL = 2;
+	Asteroid.LARGE  =	{ scale: 80, speed: 40	};
+	Asteroid.MEDIUM =	{ scale: 50, speed: 70	};
+	Asteroid.SMALL  =	{ scale: 20, speed: 100	};
 
 	return Asteroid;
 })(createjs);

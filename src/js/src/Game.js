@@ -20,10 +20,13 @@ var Game = (function (createjs) {
 			asteroid.updatePosition(delta);
 		});
 		if (ship.alive) {
+			ship.updateGraphics();
 			ship.updatePositions(delta);
 			shootIfScheduled();
-			if (ship.checkCollisons(asteroids)) {
+			var collisionAsteroid = ship.checkCollisons(asteroids);
+			if (collisionAsteroid) {
 				ship.die();
+				new ShipDeath(ship, collisionAsteroid);
 				stage.removeChild(ship);
 				setTimeout(reviveShip, 3000);
 			}
@@ -42,13 +45,13 @@ var Game = (function (createjs) {
 	var reviveShip = function() {
 		ship.revive();
 		stage.addChild(ship);
-		ship.invincible = true;
+		ship.setInvincible(true);
 		ship.velocity.x = 0;
 		ship.velocity.y = 0;
 		ship.x = stage.canvas.width / 2;
 		ship.y = stage.canvas.height / 2;
 		setTimeout(function() {
-			ship.invincible = false;
+			ship.setInvincible(false);
 		}, 3000);
 	};
 
@@ -63,14 +66,14 @@ var Game = (function (createjs) {
 			if (event.button === 0) {
 				ship.shoot();
 			} else if (event.button === 2) {
-				ship.accelerating = true;
+				ship.setAccelerating(true);
 			}
 		} else if (event.pointerType == 'touch') {
 			touches.push(event);
 			if (touches.length == 2) {
 				scheduleShot(createjs.Ticker.getTicks() + 3);
 			} else if (touches.length > 2) {
-				ship.accelerating = true;
+				ship.setAccelerating(true);
 			} else {
 				if (event.pointerId == touches[0].pointerId) {
 					ship.setRotationPoint(event.pageX, event.pageY);
@@ -83,7 +86,7 @@ var Game = (function (createjs) {
 	var pointerUp = function(event) {
 		if (event.pointerType == 'mouse') {
 			if (event.button == 2) {
-				ship.accelerating = false;
+				ship.setAccelerating(false);
 			}
 		} else if (event.pointerType == 'touch') {
 			_.each(touches, function(touch) {
@@ -93,7 +96,7 @@ var Game = (function (createjs) {
 				}
 			});
 			if (touches.length < 3) {
-				ship.accelerating = false;
+				ship.setAccelerating(false);
 			}
 		}
 		event.preventDefault();
@@ -168,8 +171,11 @@ var Game = (function (createjs) {
 			createjs.Ticker.useRAF = false;
 			createjs.Ticker.addEventListener('tick', gameLoop);
 		},
-		addAsteroid: function(x, y, state) {
+		addAsteroid: function(x, y, state, rotation) {
 			var a = new Asteroid(x, y, state || Asteroid.LARGE, stage);
+			if (rotation !== undefined) {
+				a.rotation = rotation;
+			}
 			asteroids.push(a);
 		},
 		removeAsteroid: function(asteroid) {

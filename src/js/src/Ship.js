@@ -18,6 +18,10 @@ var Ship = (function(createjs) {
 		};
 
 		this.vertices = Game.Resources.shipPoints;
+		// this.thrustLength = 0;
+		// this.thrustShape = new createjs.Shape();
+		// this.thrustShape.visible = false;
+		stage.addChild(this.thrustShape);
 
 		setupGraphics.call(this);
 
@@ -47,13 +51,13 @@ var Ship = (function(createjs) {
 
 	Ship.prototype.updatePositions = function(delta) {
 		if (this.accelerating) {
-			this.velocity.x += Math.cos(this.rotation * Math.PI / 180) * 20 * delta;
-			this.velocity.y += Math.sin(this.rotation * Math.PI / 180) * 20 * delta;
+			this.velocity.x += Math.cos(this.rotation * Math.PI / 180) * 20;
+			this.velocity.y += Math.sin(this.rotation * Math.PI / 180) * 20;
 		}
 
 		// Move
-		this.x += this.velocity.x;
-		this.y += this.velocity.y;
+		this.x += this.velocity.x * delta;
+		this.y += this.velocity.y * delta;
 
 		// Apply friction
 		this.velocity.x *= 0.99;
@@ -77,14 +81,46 @@ var Ship = (function(createjs) {
 				bullet.alive = false;
 			}
 		});
+	};
 
-		this.alpha = this.invincible ? 0.5 : 1;
+	Ship.prototype.updateGraphics = function() {
+		// if (this.thrustLength > 0) {
+		// 	var thrustPoints = Game.Resources.shipThrustPoints;
+
+		// 	this.thrustShape.visible = true;
+		// 	this.thrustShape.x = this.x;
+		// 	this.thrustShape.y = this.y;
+		// 	this.thrustShape.rotation = this.rotation;
+
+		// 	this.thrustShape.graphics
+		// 		.setStrokeStyle(4)
+		// 		.beginStroke('#fff')
+		// 		.moveTo(thrustPoints[0][0], thrustPoints[0][1])
+		// 		.lineTo(thrustPoints[1][0] - this.thrustLength, thrustPoints[1][1])
+		// 		.lineTo(thrustPoints[2][0], thrustPoints[2][1])
+		// 		.endStroke();
+
+		// } else {
+		// 	this.thrustShape.visible = false;
+		// }
 
 	};
 
 	Ship.prototype.shoot = function() {
 		if (this.alive) {
 			this.bullets.push(new Bullet(this));
+		}
+	};
+
+	Ship.prototype.setAccelerating = function(bool) {
+		if (bool) {
+			this.accelerating = true;
+			createjs.Tween.get(this)
+				.to( { thrustLength: 10 }, 1000);
+		} else {
+			this.accelerating = false;
+			createjs.Tween.get(this)
+				.to( {thrustLength: 0 }, 1000);
 		}
 	};
 
@@ -96,9 +132,9 @@ var Ship = (function(createjs) {
 	};
 
 	Ship.prototype.checkCollisons = function(asteroids) {
-		var retVal = false;
+		var retVal = null;
 		if (this.invincible) {
-			return false;
+			return null;
 		}
 		for (var i = 0; i < asteroids.length; i++) {
 			var asteroid = asteroids[i];
@@ -110,18 +146,18 @@ var Ship = (function(createjs) {
 			for (j = 0; j < avertices.length; j++) {
 				vertex = avertices[j];
 				if (asteroid.hitTest(vertex[0], vertex[1])) {
-					retVal = true;
+					retVal = asteroid;
 					break;
 				}
 			}
 			for (j = 0; j < svertices.length; j++) {
 				vertex = svertices[j];
 				if (this.hitTest(vertex[0], vertex[1])) {
-					retVal = true;
+					retVal = asteroid;
 					break;
 				}
 			}
-			if (retVal === true) break;
+			if (retVal) break;
 		}
 		return retVal;
 	};
@@ -142,12 +178,25 @@ var Ship = (function(createjs) {
 	Ship.prototype.die = function() {
 		this.alive = false;
 		this.visible = false;
-		new ShipDeath(this);
 	};
 
 	Ship.prototype.revive = function() {
 		this.alive = true;
 		this.visible = true;
+	};
+
+	Ship.prototype.setInvincible = function(val) {
+		if (val) {
+			this.alpha = 0.5;
+			createjs.Tween.get(this, { loop: true, override: true })
+				.to( { alpha: 0.1 }, 500)
+				.to( { alpha: 0.5 }, 500);
+			this.invincible = true;
+		} else {
+			createjs.Tween.removeTweens(this);
+			this.invincible = false;
+			this.alpha = 1;
+		}
 	};
 
 	return Ship;

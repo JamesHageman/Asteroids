@@ -6,6 +6,7 @@ function() {
 			'js/src/Background.js',
 			'js/src/Bullet.js',
 			'js/src/Asteroid.js',
+			'js/src/AsteroidDeath.js',
 			'js/src/Ship.js',
 			'js/src/ShipDeath.js',
 			'js/src/LevelController.js'],
